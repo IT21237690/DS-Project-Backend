@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const User = require('./models/user'); // Adjust the path as needed
 require('dotenv').config();
 
 function connectToDatabase() {
@@ -19,4 +18,4 @@ function connectToDatabase() {
 
 }
 
-module.exports = { connectToDatabase, User };
+module.exports = { connectToDatabase};
