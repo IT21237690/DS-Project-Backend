@@ -143,33 +143,67 @@ router.patch('/update/:code', upload.single('video'), async (req, res) => {
       return res.status(404).json({ message: 'Course not found' });
     }
 
-    // Update course properties
+    // Update course properties (excluding video)
     for (let key in req.body) {
-      if (key !== 'video') { // Skip 'video' field for course update
+      if (key !== 'video') {
         course[key] = req.body[key];
       }
     }
 
-    // Check if a new video file was uploaded
+    // Handle video update logic
     if (req.file) {
-      // Add or update the video for the course
-      const { title } = req.body;
-      const videoUrl = req.file.path;
-      const existingVideoIndex = course.videos.findIndex(video => video.title === title);
+      const { video } = req.body; // Assuming 'video' field contains title for identification
+
+      const existingVideoIndex = course.videos.findIndex(
+        (videoItem) => videoItem.title === video
+      );
 
       if (existingVideoIndex !== -1) {
         // Update existing video
-        course.videos[existingVideoIndex].url = videoUrl;
+        course.videos[existingVideoIndex].url = req.file.path;
       } else {
-        // Add new video
-        course.videos.push({ title, url: videoUrl });
+        // Add new video (consider error handling for duplicate titles)
+        course.videos.push({ title: video, url: req.file.path }); // Assuming 'video' field is the title
       }
+    } else {
+      // No new video uploaded, maintain existing videos
+      // (Optional: Consider adding a flag to explicitly remove a video if needed)
     }
 
     await course.save();
     res.json(course);
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+});
+
+router.delete('/:courseId/videos/:videoId', async (req, res) => {
+  try {
+    const courseId = req.params.courseId;
+    const videoId = req.params.videoId;
+
+    // Find the course by ID
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    // Find the index of the video in the course's videos array
+    const videoIndex = course.videos.findIndex(video => video._id === videoId);
+    // if (videoIndex === -1) {
+    //   return res.status(404).json({ message: 'Video not found' });
+    // }
+
+    // Remove the video from the course's videos array
+    course.videos.splice(videoIndex, 1);
+
+    // Save the course without the deleted video
+    await course.save();
+
+    res.json({ message: 'Video deleted successfully', course });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 
