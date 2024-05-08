@@ -21,25 +21,26 @@ router.post('/add', upload.single('video'), async (req, res) => {
     const { code, cname, description, credits } = req.body;
 
     // Create the course object with provided details
-    const course = await Course.create({
+    let course = new Course({
       code,
       cname,
       description,
       credits,
-      videos: [] 
+      video: {}
     });
 
     // Check if a video was uploaded
     if (req.file) {
-      // Add the uploaded video to the course's videos array
+      // Add the uploaded video to the course object
       const { title } = req.body;
       const videoUrl = req.file.path;
 
-      course.videos.push({ title, url: videoUrl });
-
-      // Save the course with the added video
-      await course.save();
+      course.video.title = title;
+      course.video.url = videoUrl;
     }
+
+    // Save the course
+    course = await course.save();
 
     res.status(201).json(course);
   } catch (err) {
