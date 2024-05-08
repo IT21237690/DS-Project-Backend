@@ -9,10 +9,10 @@ const courseSchema = new mongoose.Schema({
   cname: String,
   description: String,
   credits: String,
-  videos: [{ 
+  video: { 
     title: String, // Title of the video
-    url: String,   // URL or file path of the video
-  }]
+    url: String    // URL or file path of the video
+  }
 });
 
 const Course = mongoose.model('Course', courseSchema);
