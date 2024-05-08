@@ -1,17 +1,14 @@
 const mongoose = require('mongoose');
 
 const courseSchema = new mongoose.Schema({
-  // courseData:{
-    code: {
-      type: String,
-      unique: true,
-      required: true 
-    },
-    cname: String,
-    description: String,
-    credits: String,
-    faculty: [String], 
-// },
+  code: {
+    type: String,
+    unique: true,
+    required: true 
+  },
+  cname: String,
+  description: String,
+  credits: String,
   videos: [{ 
     title: String, // Title of the video
     url: String,   // URL or file path of the video
