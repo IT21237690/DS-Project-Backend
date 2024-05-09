@@ -28,6 +28,7 @@ app.use(express.json());
   }
 
   const authorizationResult = authorizeUser(token);
+  //console.log(authorizationResult)
 
   return res.status(authorizationResult.authorized ? 200 : 403).json(authorizationResult);
 });

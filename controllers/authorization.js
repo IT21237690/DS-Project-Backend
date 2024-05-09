@@ -11,7 +11,7 @@ const authorizeUser = (token) => {
     if (decodedToken.role === 'student') {
       return { authorized: true, role: 'student', sid: decodedToken.sid };
     } else if (decodedToken.role === 'instructor') {
-      return { authorized: true, role: 'instructor', iid: decodedToken.instructorId };
+      return { authorized: true, role: 'instructor', iid: decodedToken.iid };
     } else {
       return { authorized: false };
     }
