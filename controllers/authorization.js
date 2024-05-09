@@ -1,11 +1,17 @@
 const jwt = require('jsonwebtoken');
 
-const authorizeStudent = (token) => {
+const authorizeUser = (token) => {
   try {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
-    if (decodedToken && decodedToken.role === 'student') {
-      return { authorized: true, sid: decodedToken.sid };
+    if (!decodedToken) {
+      return { authorized: false };
+    }
+
+    if (decodedToken.role === 'student') {
+      return { authorized: true, role: 'student', id: decodedToken.sid };
+    } else if (decodedToken.role === 'instructor') {
+      return { authorized: true, role: 'instructor', id: decodedToken.instructorId };
     } else {
       return { authorized: false };
     }
@@ -14,4 +20,4 @@ const authorizeStudent = (token) => {
   }
 };
 
-module.exports = authorizeStudent;
+module.exports = authorizeUser;

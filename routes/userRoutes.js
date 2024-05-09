@@ -43,8 +43,11 @@ router.post('/login', async (req, res) => {
     }
 
     let tokenPayload = { username: user.username, role: user.role };
+    
     if (user.role === 'student') {
       tokenPayload.sid = user.studentId;
+    } else if (user.role === 'instructor') {
+      tokenPayload.iid = user.instructorId;
     }
 
     const expiresIn = '1h';
@@ -55,6 +58,7 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
 
 
 
