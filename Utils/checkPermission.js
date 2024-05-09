@@ -1,28 +1,24 @@
 const axios = require('axios');
 
-
 const checkPermission = async (token) => {
-    try {
-      const response = await axios.get('http://localhost:5001/authorize', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-  
-      const authorized = response.data;
-      if (authorized) {
-        return { authorized: true, sid: response.data.sid };
-      } else {
-        return { authorized: false };
+  try {
+    const response = await axios.get('http://localhost:5001/authorize', {
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    } catch (error) {
-      console.error('Error checking permission:', error);
+    });
+
+    const { authorized, role, sid } = response.data;
+    
+    if (authorized && role === 'student') {
+      return { authorized: true, sid };
+    } else {
       return { authorized: false };
     }
-  };
-  
-  module.exports = checkPermission;
-  
-
+  } catch (error) {
+    console.error('Error checking permission:', error);
+    return { authorized: false };
+  }
+};
 
 module.exports = checkPermission;
