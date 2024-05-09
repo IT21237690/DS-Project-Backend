@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { connectToDatabase } = require('./db connection'); 
 const userRoutes = require('./routes/userRoutes');
-const authorizeStudent = require('./controllers/authorization');
+const authorizeUser = require('./controllers/authorization');
 
 
 
@@ -27,10 +27,11 @@ app.use(express.json());
     return res.status(401).json({ authorized: false });
   }
 
-  const authorizationResult = authorizeStudent(token);
+  const authorizationResult = authorizeUser(token);
 
   return res.status(authorizationResult.authorized ? 200 : 403).json(authorizationResult);
 });
+
 
 
 
