@@ -40,6 +40,28 @@ const generateAccessToken = async () => {
   }
 };
 
+const checkPermission = async (token) => {
+  try {
+    const response = await axios.get('http://service1:5000/authorize', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const { authorized, role, sid } = response.data;
+    
+    if (authorized && role === 'student') {
+      return { authorized: true, sid };
+    } else {
+      return { authorized: false };
+    }
+  } catch (error) {
+    console.error('Error checking permission:', error);
+    return { authorized: false };
+  }
+};
+
+
 /**
  * Create an order to start the transaction.
  * @see https://developer.paypal.com/docs/api/orders/v2/#orders_create
@@ -86,7 +108,7 @@ const createOrder = async (cart) => {
  * Capture payment for the created order to complete the transaction.
  * @see https://developer.paypal.com/docs/api/orders/v2/#orders_capture
  */
-const captureOrder = async (orderID) => {
+const captureOrder = async (orderID,courseCode,permission) => {
   const accessToken = await generateAccessToken();
   const url = `${base}/v2/checkout/orders/${orderID}/capture`;
 
@@ -102,6 +124,16 @@ const captureOrder = async (orderID) => {
       // "PayPal-Mock-Response": '{"mock_application_codes": "INTERNAL_SERVER_ERROR"}'
     },
   });
+
+  try {
+    const response = await axios.post(`http://service1:5001/enroll/${courseCode}/${permission.sid}`, {
+      
+    });
+    
+    console.log(response.data); // Output the response data
+  } catch (error) {
+    console.error('Error enrolling user in course:', error);
+  }
 
   return handleResponse(response);
 };
@@ -131,10 +163,16 @@ app.post("/api/orders", async (req, res) => {
   }
 });
 
-app.post("/api/orders/:orderID/capture", async (req, res) => {
+app.post("/api/orders/:orderID/capture/:courseCode", async (req, res) => {
   try {
+
+    const { courseCode } = req.params;
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+
+    const permission = await checkPermission(token);
+
     const { orderID } = req.params;
-    const { jsonResponse, httpStatusCode } = await captureOrder(orderID);
+    const { jsonResponse, httpStatusCode } = await captureOrder(orderID,courseCode,permission);
     res.status(httpStatusCode).json(jsonResponse);
   } catch (error) {
     console.error("Failed to create order:", error);

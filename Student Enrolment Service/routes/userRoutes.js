@@ -45,18 +45,18 @@ const router = express.Router();
 // });
 
 
-router.post('/enroll/:code', async (req, res) => {
+router.post('/enroll/:code/:sid', async (req, res) => {
   const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
   
   try {
-    const permission = await checkPermission(token);
-    console.log(permission)
-    if (!permission.authorized) {
-      return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
-    }
+    // const permission = await checkPermission(token);
+    // console.log(permission)
+    // if (!permission.authorized) {
+    //   return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
+    // }
 
     const code = req.params.code;
-    const sid = permission.sid; 
+    const sid = req.params.sid; 
 
     const course = await Course.findOne({ code });
     if (!course) {
