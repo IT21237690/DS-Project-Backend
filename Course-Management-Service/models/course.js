@@ -18,6 +18,11 @@ const courseSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  
+  isAdminApproved: {
+    type: Boolean,
+    default: false
+  },
    
 });
 

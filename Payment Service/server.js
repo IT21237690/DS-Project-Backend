@@ -126,7 +126,7 @@ const captureOrder = async (orderID,courseCode,permission) => {
   });
 
   try {
-    const response = await axios.post(`http://service1:5001/enroll/${courseCode}/${permission.sid}`, {
+    const response = await axios.post(`http://service2:5001/enroll/${courseCode}/${permission.sid}`, {
       
     });
     
