@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  service1:
+    build:
+      context: ./User Management Service
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    networks:
+      - my_network
+
+  service2:
+    build:
+      context: ./Student Enrolment Service
+      dockerfile: Dockerfile
+    ports:
+      - "5001:5001"
+    networks:
+      - my_network
+
+  service3:
+    build:
+      context: ./Course-Management-Service
+      dockerfile: Dockerfile
+    ports:
+      - "5002:5002"
+    networks:
+      - my_network
+  
+  service4:
+    build:
+      context: ./Payment Service
+      dockerfile: Dockerfile
+    ports:
+      - "5003:5003"
+    networks:
+      - my_network
+
+networks:
+  my_network:
+
