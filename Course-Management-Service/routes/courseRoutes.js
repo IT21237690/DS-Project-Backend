@@ -32,7 +32,7 @@ router.post('/add', upload.single('video'), async (req, res) => {
       return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
     }
 
-    const { code, cname, description, credits } = req.body;
+    const { code, cname, description, credits, price } = req.body;
     const instructorId = permission.iid;
 
     // Create the course object with provided details and instructor ID
@@ -42,6 +42,7 @@ router.post('/add', upload.single('video'), async (req, res) => {
       description,
       credits,
       instructorId,
+      price,
       video: {}
     });
 
@@ -151,6 +152,8 @@ router.patch('/update/:code', upload.single('video'), async (req, res) => {
     course.cname = req.body.cname || course.cname;
     course.description = req.body.description || course.description;
     course.credits = req.body.credits || course.credits;
+    course.price = req.body.price || course.price;
+
 
     // Check if a new video file is uploaded
     if (req.file) {

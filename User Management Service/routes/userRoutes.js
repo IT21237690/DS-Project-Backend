@@ -60,6 +60,36 @@ router.post('/login', async (req, res) => {
 });
 
 
+router.get("/getuser/:sid", async (req, res) => {
+  try {
+
+    const sid = req.params.sid; 
+
+    // Find user by studentID (assuming studentID field exists in your User model)
+    const user = await User.findOne({ studentId: sid });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Respond with user data (excluding sensitive information)
+    const sanitizedUser = {
+      username: user.username,
+      role: user.role,
+      sid: user.studentId,
+      enrolledCourses: user.enrolledCourses.map((courseCode) => ({
+        courseCode
+      })),
+    };
+
+    res.status(200).json(sanitizedUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
 
 
 module.exports = router;
