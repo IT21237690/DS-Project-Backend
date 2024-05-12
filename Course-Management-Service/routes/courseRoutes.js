@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Course = require('../models/course');
+const User = require('../models/user');
 const checkPermission = require('../Utils/checkPermission');
 const multer = require('multer'); 
 
@@ -35,6 +36,9 @@ router.post('/add', upload.single('video'), async (req, res) => {
     const { code, cname, description, credits, price } = req.body;
     const instructorId = permission.iid;
 
+    const user = await User.findOne({ instructorId: instructorId, role: 'instructor' });
+
+
     // Create the course object with provided details and instructor ID
     let course = new Course({
       code,
@@ -63,6 +67,8 @@ router.post('/add', upload.single('video'), async (req, res) => {
 
     // Save the course
     course = await course.save();
+    user.addedCourses.push(code);
+    await user.save();
 
     // Return the saved course with the thumbnail data
     res.status(201).json({ course });
@@ -182,10 +188,18 @@ router.delete('/delete/:code', async (req, res) => {
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
     }
+
+    // Find and update instructor's addedCourses
+    await User.updateMany(
+      { role: 'instructor' }, // Filter for instructors
+      { $pull: { addedCourses: req.params.code } } // Remove course from addedCourses array
+    );
+
     res.json({ message: 'Course deleted' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
+
 
 module.exports = router;

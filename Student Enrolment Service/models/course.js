@@ -9,11 +9,21 @@ const courseSchema = new mongoose.Schema({
   cname: String,
   description: String,
   credits: String,
-  faculty: [String] 
+  video: { 
+    title: String,
+    url: String,
+    thumbnail: String
+  },
+  instructorId: {
+    type: String,
+    required: true
+  },
+  price: {
+    type: String,
+    required: true
+  },
+   
 });
 
-
-
 const Course = mongoose.model('Course', courseSchema);
-
 module.exports = Course;
