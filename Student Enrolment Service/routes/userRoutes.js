@@ -46,7 +46,6 @@ const router = express.Router();
 
 
 router.post('/enroll/:code/:sid', async (req, res) => {
-  const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
   
   try {
     // const permission = await checkPermission(token);
@@ -57,6 +56,8 @@ router.post('/enroll/:code/:sid', async (req, res) => {
 
     const code = req.params.code;
     const sid = req.params.sid; 
+
+    console.log(sid)
 
     const course = await Course.findOne({ code });
     if (!course) {

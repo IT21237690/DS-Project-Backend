@@ -2,6 +2,9 @@ import express from "express";
 import fetch from "node-fetch";
 import "dotenv/config";
 import path from "path";
+import axios from 'axios';
+import jwt from 'jsonwebtoken';
+
 
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PORT = 5003 } = process.env;
 const base = "https://api-m.sandbox.paypal.com";
@@ -61,7 +64,6 @@ const checkPermission = async (token) => {
   }
 };
 
-
 /**
  * Create an order to start the transaction.
  * @see https://developer.paypal.com/docs/api/orders/v2/#orders_create
@@ -81,7 +83,7 @@ const createOrder = async (cart) => {
       {
         amount: {
           currency_code: "USD",
-          value: "50.00",
+          value: "1.00",
         },
       },
     ],
@@ -100,6 +102,7 @@ const createOrder = async (cart) => {
     method: "POST",
     body: JSON.stringify(payload),
   });
+
 
   return handleResponse(response);
 };
@@ -125,15 +128,14 @@ const captureOrder = async (orderID,courseCode,permission) => {
     },
   });
 
-  try {
-    const response = await axios.post(`http://service2:5001/enroll/${courseCode}/${permission.sid}`, {
+
+  console.log(courseCode)
+  console.log(permission.sid)
+
+   const enrollResponse = await axios.post(`http://service2:5001/user/enroll/${courseCode}/${permission.sid}`, {
       
     });
-    
-    console.log(response.data); // Output the response data
-  } catch (error) {
-    console.error('Error enrolling user in course:', error);
-  }
+
 
   return handleResponse(response);
 };
@@ -153,10 +155,12 @@ async function handleResponse(response) {
 
 app.post("/api/orders", async (req, res) => {
   try {
-    // use the cart information passed from the front-end to calculate the order amount detals
+  
     const { cart } = req.body;
     const { jsonResponse, httpStatusCode } = await createOrder(cart);
+
     res.status(httpStatusCode).json(jsonResponse);
+
   } catch (error) {
     console.error("Failed to create order:", error);
     res.status(500).json({ error: "Failed to create order." });
@@ -166,11 +170,11 @@ app.post("/api/orders", async (req, res) => {
 app.post("/api/orders/:orderID/capture/:courseCode", async (req, res) => {
   try {
 
-    const { courseCode } = req.params;
+    const {courseCode} = req.params;
     const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
 
     const permission = await checkPermission(token);
-
+    // console.log(courseCode)
     const { orderID } = req.params;
     const { jsonResponse, httpStatusCode } = await captureOrder(orderID,courseCode,permission);
     res.status(httpStatusCode).json(jsonResponse);
