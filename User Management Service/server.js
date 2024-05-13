@@ -18,7 +18,7 @@ app.use(express.json());
 
 
 // Use the authentication routes
- app.use('/user', userRoutes);
+ app.use('/api/user', userRoutes);
 
  app.get('/authorize', (req, res) => {
   const token = req.headers.authorization && req.headers.authorization.split(' ')[1];

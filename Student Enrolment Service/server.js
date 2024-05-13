@@ -18,7 +18,7 @@ app.use(express.json());
 
 
 // Use the authentication routes
-app.use('/user', userRoutes);
+app.use('/api/user', userRoutes);
 //app.use('/course', courseRoutes);
 
 
