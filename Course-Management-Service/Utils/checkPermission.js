@@ -2,7 +2,7 @@ const axios = require('axios');
 
 const checkPermission = async (token) => {
   try {
-    const response = await axios.get('http://service1:5000/authorize', {
+    const response = await axios.get('http://localhost:5000/authorize', {
       headers: {
         Authorization: `Bearer ${token}`
       }

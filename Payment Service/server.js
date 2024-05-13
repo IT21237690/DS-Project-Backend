@@ -4,6 +4,8 @@ import "dotenv/config";
 import path from "path";
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
+import cors from 'cors';
+
 
 
 const { PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PORT = 5003 } = process.env;
@@ -15,6 +17,7 @@ app.use(express.static("client/dist"));
 
 // parse post params sent in body in json format
 app.use(express.json());
+app.use(cors());
 
 /**
  * Generate an OAuth 2.0 access token for authenticating with PayPal REST APIs.
@@ -45,7 +48,7 @@ const generateAccessToken = async () => {
 
 const checkPermission = async (token) => {
   try {
-    const response = await axios.get('http://service1:5000/authorize', {
+    const response = await axios.get('http://localhost:5000/authorize', {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -132,7 +135,7 @@ const captureOrder = async (orderID,courseCode,permission) => {
   console.log(courseCode)
   console.log(permission.sid)
 
-   const enrollResponse = await axios.post(`http://service2:5001/user/enroll/${courseCode}/${permission.sid}`, {
+   const enrollResponse = await axios.post(`http://localhost:5001/user/enroll/${courseCode}/${permission.sid}`, {
       
     });
 
