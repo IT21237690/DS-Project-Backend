@@ -130,9 +130,9 @@ router.get('/allCourses', async (req, res) => {
 
 // READ single course
 //authorization should be passed
-router.get('/get/:code', async (req, res) => {
+router.get('/get/:courseCode', async (req, res) => {
   try {
-    const course = await Course.findOne({ code: req.params.code });
+    const course = await Course.findOne({ code: req.params.courseCode });
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
     }
