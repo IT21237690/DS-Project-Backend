@@ -86,7 +86,7 @@ const createOrder = async (cart) => {
       {
         amount: {
           currency_code: "USD",
-          value: "1.00",
+          value: "20.00",
         },
       },
     ],
@@ -135,7 +135,7 @@ const captureOrder = async (orderID,courseCode,permission) => {
   console.log(courseCode)
   console.log(permission.sid)
 
-   const enrollResponse = await axios.post(`http://localhost:5001/user/enroll/${courseCode}/${permission.sid}`, {
+   const enrollResponse = await axios.post(`http://localhost:5001/api/user/enroll/${courseCode}/${permission.sid}`, {
       
     });
 
