@@ -4,6 +4,43 @@ const Course = require('../models/course');
 const User = require('../models/user');
 const checkPermission = require('../Utils/checkPermission');
 const multer = require('multer'); 
+const { exec } = require('child_process');
+const fs = require('fs');
+const { Readable } = require('stream');
+const path = require('path'); 
+
+
+
+
+const isEnrolled = (req, res, next) => {
+  
+  const { sid, courseCode } = req.params;
+
+  // Check if user is enrolled
+  const isUserEnrolled = checkUserEnrollment(sid, courseCode); 
+
+  if (isUserEnrolled) {
+      next(); // User is enrolled, proceed to download
+  } else {
+      res.status(403).json({ error: 'You are not enrolled in this course.' });
+  }
+};
+
+
+
+const checkUserEnrollment = async (studentId, courseCode) => {
+  try {
+
+      const user = await User.findOne({ studentId });
+      
+     
+      return user && user.enrolledCourses.includes(courseCode);
+  } catch (error) {
+      console.error('Error checking user enrollment:', error);
+      return false; // Return false in case of an error
+  }
+};
+
 
 
 // Multer configuration for storing uploaded videos
@@ -18,10 +55,9 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Route to add a new course along with video upload
-const { exec } = require('child_process');
-const fs = require('fs');
-const { Readable } = require('stream');
+
+
+
 
 router.post('/add', upload.single('video'), async (req, res) => {
   const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
@@ -33,7 +69,7 @@ router.post('/add', upload.single('video'), async (req, res) => {
       return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
     }
 
-    const { code, cname, description, credits, price } = req.body;
+    const { code, cname, description, price } = req.body;
     const instructorId = permission.iid;
 
     const user = await User.findOne({ instructorId: instructorId, role: 'instructor' });
@@ -44,7 +80,6 @@ router.post('/add', upload.single('video'), async (req, res) => {
       code,
       cname,
       description,
-      credits,
       instructorId,
       price,
       video: {}
@@ -129,7 +164,6 @@ router.get('/allCourses', async (req, res) => {
 });
 
 // READ single course
-//authorization should be passed
 router.get('/get/:courseCode', async (req, res) => {
   try {
     const course = await Course.findOne({ code: req.params.courseCode });
@@ -157,7 +191,6 @@ router.patch('/update/:code', upload.single('video'), async (req, res) => {
     // Update course details (excluding video)
     course.cname = req.body.cname || course.cname;
     course.description = req.body.description || course.description;
-    course.credits = req.body.credits || course.credits;
     course.price = req.body.price || course.price;
 
 
@@ -181,7 +214,7 @@ router.patch('/update/:code', upload.single('video'), async (req, res) => {
 });
 
 
-//authorization should be passed
+
 router.delete('/delete/:code', async (req, res) => {
   try {
     const course = await Course.findOneAndDelete({ code: req.params.code });
@@ -200,6 +233,36 @@ router.delete('/delete/:code', async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+
+router.get('/download/:sid/:courseCode', isEnrolled, async (req, res) => {
+  const { courseCode } = req.params;
+
+  try {
+    // Find the course in the database
+    const course = await Course.findOne({ code: courseCode });
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found.' });
+    }
+
+    // Get the video URL from the course
+    const videoUrl = course.video.url;
+
+    // Check if the video URL exists
+    if (!videoUrl) {
+      return res.status(404).json({ error: 'Video URL not found.' });
+    }
+
+    // Stream the video file as response
+    const fileStream = fs.createReadStream(videoUrl);
+    fileStream.pipe(res);
+  } catch (error) {
+    console.error('Error downloading video:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
 
 
 module.exports = router;

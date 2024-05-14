@@ -8,7 +8,6 @@ const courseSchema = new mongoose.Schema({
   },
   cname: String,
   description: String,
-  credits: String,
   video: { 
     title: String,
     url: String,

@@ -13,6 +13,7 @@ const PORT = process.env.PORT || 5001;
 // Connect to the database
 connectToDatabase();
 
+app.use(cors());
 app.use(express.json());
 
 
