@@ -2,6 +2,7 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const Course = require('../models/course');
 require('dotenv').config();
 
 const router = express.Router();
@@ -118,6 +119,32 @@ router.get("/getins/:iid", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
+
+
+router.put('/admin/:code/approve', async (req, res) => {
+  try {
+    const courseId = req.params.code;
+
+    // Find the course by ID
+    const course = await Course.findOne({code: courseId});
+
+    if (!course) {
+      return res.status(404).json({ error: 'Course not found' });
+    }
+
+    // Update the course to set isApproved to true
+    course.isApproved = true;
+    await course.save();
+
+    res.json({ message: 'Course approved successfully'});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
 
 
 

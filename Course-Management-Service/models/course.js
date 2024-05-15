@@ -21,7 +21,10 @@ const courseSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-   
+  isApproved: {
+    type: Boolean,
+    default: false
+  }
 });
 
 const Course = mongoose.model('Course', courseSchema);
