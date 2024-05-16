@@ -71,13 +71,10 @@ const checkPermission = async (token) => {
  * Create an order to start the transaction.
  * @see https://developer.paypal.com/docs/api/orders/v2/#orders_create
  */
-const createOrder = async (cart) => {
+const createOrder = async (cart,afterPrice) => {
   // use the cart information passed from the front-end to calculate the purchase unit details
-  console.log(
-    "shopping cart information passed from the frontend createOrder() callback:",
-    cart,
-  );
 
+  // console.log(afterPrice, "This is afterPrice")
   const accessToken = await generateAccessToken();
   const url = `${base}/v2/checkout/orders`;
   const payload = {
@@ -86,7 +83,7 @@ const createOrder = async (cart) => {
       {
         amount: {
           currency_code: "USD",
-          value: "1.00",
+          value: afterPrice,
         },
       },
     ],
@@ -156,11 +153,26 @@ async function handleResponse(response) {
   }
 }
 
-app.post("/api/orders", async (req, res) => {
+app.post("/api/orders/:courseCode", async (req, res) => {
   try {
-  
+    const { courseCode } = req.params;
+
+    async function fetchCourse() {
+      try {
+        const response = await axios.get('http://localhost:5002/api/course/get/' + `${courseCode}`);
+        return response.data.price.replace("$", "");
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+        throw error; // Re-throw the error for handling in createOrder
+      }
+    }
+
+    const afterPrice = await fetchCourse(); // Wait for fetchCourse to resolve
+
     const { cart } = req.body;
-    const { jsonResponse, httpStatusCode } = await createOrder(cart);
+    // console.log(cart, afterPrice); // Verify afterPrice here
+
+    const { jsonResponse, httpStatusCode } = await createOrder(cart, afterPrice);
 
     res.status(httpStatusCode).json(jsonResponse);
 
