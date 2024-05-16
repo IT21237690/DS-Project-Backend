@@ -19,12 +19,6 @@ const router = express.Router();
 router.post('/enroll/:code/:sid', async (req, res) => {
   
   try {
-    // const permission = await checkPermission(token);
-    // console.log(permission)
-    // if (!permission.authorized) {
-    //   return res.status(403).json({ message: 'Forbidden: Insufficient permissions' });
-    // }
-
     const code = req.params.code;
     const sid = req.params.sid; 
 

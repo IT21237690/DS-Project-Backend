@@ -235,10 +235,21 @@ router.delete('/delete/:code', async (req, res) => {
 });
 
 
-router.get('/download/:sid/:courseCode', isEnrolled, async (req, res) => {
+router.get('/download/:sid/:courseCode', async (req, res) => {
   const { courseCode } = req.params;
+  const { sid } = req.params;
+ 
 
   try {
+    // Check if the user is enrolled in the course
+
+    const user = await User.findOne({ studentId:sid });
+
+    const isEnrolled = user.enrolledCourses.includes(courseCode);
+    if (!isEnrolled) {
+      return res.status(409).json({ error: 'You are not enrolled in this course.' });
+    }
+
     // Find the course in the database
     const course = await Course.findOne({ code: courseCode });
 
@@ -262,6 +273,7 @@ router.get('/download/:sid/:courseCode', isEnrolled, async (req, res) => {
     res.status(500).json({ error: 'Internal server error.' });
   }
 });
+
 
 
 
