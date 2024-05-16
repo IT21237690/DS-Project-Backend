@@ -37,6 +37,15 @@ services:
     networks:
       - apisix
 
+  service5:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "5004:5004"
+    networks:
+      - apisix
+
   apisix-dashboard:
     image: apache/apisix-dashboard:3.0.1-alpine
     restart: always

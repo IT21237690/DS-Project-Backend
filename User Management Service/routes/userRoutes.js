@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 const User = require('../models/user');
 const Course = require('../models/course');
 require('dotenv').config();
@@ -9,10 +10,16 @@ const router = express.Router();
 
 router.post('/register', async (req, res) => {
   try {
-    const { username, password, role, name,email,phone } = req.body;
-    
+    const { username, password, role, name, email, phone } = req.body;
+
+    // Check if a user already exists with the same username, email, or phone
+    const existingUser = await User.findOne({ $or: [{ username }, { email }, { phone }] });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already registered' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
-  
+
     const newUser = new User({
       username,
       password: hashedPassword,
@@ -21,14 +28,22 @@ router.post('/register', async (req, res) => {
       email,
       phone
     });
-  
+
     await newUser.save();
+
+    await axios.post(`http://service5:5004/api/email/notifyReg/${email}`, {}, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error('Error occurred during registration:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
 
 router.post('/login', async (req, res) => {
   try {
@@ -65,7 +80,6 @@ router.post('/login', async (req, res) => {
 
 router.get("/getuser/:sid", async (req, res) => {
   try {
-
     const sid = req.params.sid; 
 
     // Find user by studentID (assuming studentID field exists in your User model)
@@ -75,14 +89,14 @@ router.get("/getuser/:sid", async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Respond with user data (excluding sensitive information)
+    // Respond with user data (including email and phone)
     const sanitizedUser = {
       username: user.username,
       role: user.role,
       sid: user.studentId,
-      enrolledCourses: user.enrolledCourses.map((courseCode) => ({
-        courseCode
-      })),
+      email: user.email,
+      phone: user.phone,
+      enrolledCourses: user.enrolledCourses.map((courseCode) => ({ courseCode })),
     };
 
     res.status(200).json(sanitizedUser);
@@ -91,6 +105,7 @@ router.get("/getuser/:sid", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 
 router.get("/getins/:iid", async (req, res) => {

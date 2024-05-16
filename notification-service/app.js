@@ -6,7 +6,7 @@ const smsRoutes = require('./routes/smsRoutes')
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use('/email', emailRoutes);
-app.use('/sms', smsRoutes);
+app.use('/api/email', emailRoutes);
+app.use('/api/sms', smsRoutes);
 
 module.exports = app;

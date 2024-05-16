@@ -52,7 +52,7 @@ const generateAccessToken = async () => {
 
 const checkPermission = async (token) => {
   try {
-    const response = await axios.get('http://localhost:5000/authorize', {
+    const response = await axios.get('http://service1:5000/authorize', {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -136,11 +136,11 @@ const captureOrder = async (orderID,courseCode,permission) => {
   console.log(courseCode)
   console.log(permission.sid)
 
-  const paymentResponse = await axios.post(`http://localhost:5003/api/payment/createPayment/${orderID}/${permission.sid}/${courseCode}`, {
+  const paymentResponse = await axios.post(`http://service4:5003/api/payment/createPayment/${orderID}/${permission.sid}/${courseCode}`, {
 
   });
 
-   const enrollResponse = await axios.post(`http://localhost:5001/api/user/enroll/${courseCode}/${permission.sid}`, {
+   const enrollResponse = await axios.post(`http://service2:5001/api/user/enroll/${courseCode}/${permission.sid}`, {
       
     });
 
@@ -167,7 +167,7 @@ app.post("/api/orders/:courseCode", async (req, res) => {
 
     async function fetchCourse() {
       try {
-        const response = await axios.get('http://localhost:5002/api/course/get/' + `${courseCode}`);
+        const response = await axios.get('http://service3:5002/api/course/get/' + `${courseCode}`);
         return response.data.price.replace("$", "");
       } catch (error) {
         console.error('Error fetching courses:', error);

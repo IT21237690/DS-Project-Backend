@@ -253,9 +253,27 @@ curl -i -X PUT http://127.0.0.1:9180/apisix/admin/routes/2 \
      -H 'X-API-KEY: ds' \
      -H 'Content-Type: application/json' \
      -d '{
-          "uri": "/api/orders",
+          "uri": "/api/orders/*",
           "methods": ["POST", "OPTIONS"],
           "upstream_id": "4",
+          "plugins": {
+            "cors": {
+              "allow_origin": ["http://localhost:3000"],
+              "allow_methods": "GET,POST,PUT,DELETE,OPTIONS",
+              "allow_headers": "Content-Type,Authorization",
+              "allow_credentials": true
+            }
+          }
+        }'
+
+
+ curl -i -X PUT http://127.0.0.1:9180/apisix/admin/routes/13 \
+     -H 'X-API-KEY: ds' \
+     -H 'Content-Type: application/json' \
+     -d '{
+          "uri": "/api/user/admin/*/approve",
+          "methods": ["PUT", "OPTIONS"],
+          "upstream_id": "1",
           "plugins": {
             "cors": {
               "allow_origin": ["http://localhost:3000"],
