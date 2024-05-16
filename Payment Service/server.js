@@ -5,6 +5,10 @@ import path from "path";
 import axios from 'axios';
 import jwt from 'jsonwebtoken';
 import cors from 'cors';
+import dotenv from 'dotenv'
+
+import connectToMongoDB from "./db/ConnectToMongoDB.js";
+import paymentRoutes from "./routes/payment.routes.js";
 
 
 
@@ -132,6 +136,10 @@ const captureOrder = async (orderID,courseCode,permission) => {
   console.log(courseCode)
   console.log(permission.sid)
 
+  const paymentResponse = await axios.post(`http://localhost:5003/api/payment/createPayment/${orderID}/${permission.sid}/${courseCode}`, {
+
+  });
+
    const enrollResponse = await axios.post(`http://localhost:5001/api/user/enroll/${courseCode}/${permission.sid}`, {
       
     });
@@ -204,6 +212,9 @@ app.get("/", (req, res) => {
   res.sendFile(path.resolve("./client/dist/index.html"));
 });
 
+app.use('/api/payment', paymentRoutes);
+
 app.listen(PORT, () => {
   console.log(`Node server listening at http://localhost:${PORT}/`);
+  connectToMongoDB()
 });
