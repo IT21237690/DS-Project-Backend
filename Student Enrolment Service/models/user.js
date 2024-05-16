@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
+  email: String,
+  phone: String,
   role: {
     type: String,
     enum: ['student', 'instructor'],
@@ -29,6 +31,7 @@ const userSchema = new mongoose.Schema({
   }
 });
 
+// Pre-save middleware to generate a unique SID or Instructor ID
 // Pre-save middleware to generate a unique SID or Instructor ID
 userSchema.pre('save', async function(next) {
   if (this.isNew) { // Check if the document is new
