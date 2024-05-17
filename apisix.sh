@@ -283,7 +283,27 @@ curl -i -X PUT http://127.0.0.1:9180/apisix/admin/routes/2 \
             }
           }
         }'
+
+
+curl -i -X PUT http://127.0.0.1:9180/apisix/admin/routes/14 \
+     -H 'X-API-KEY: ds' \
+     -H 'Content-Type: application/json' \
+     -d '{
+          "uri": "/api/course/download/*/*",
+          "methods": ["GET", "OPTIONS"],
+          "upstream_id": "3",
+          "plugins": {
+            "cors": {
+              "allow_origin": ["http://localhost:3000"],
+              "allow_methods": "GET,POST,PUT,DELETE,OPTIONS",
+              "allow_headers": "Content-Type,Authorization",
+              "allow_credentials": true
+            }
+          }
+        }'
            
+
+
            
            
            
