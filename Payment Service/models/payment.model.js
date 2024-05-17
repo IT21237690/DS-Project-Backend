@@ -2,19 +2,14 @@ import mongoose from "mongoose";
 
 const paymentSchema = new mongoose.Schema({
     paymentID: {
-        type: String,
-        required: true,
-        unique: true,
+        type: String
     },
     userID: {
-        type: String,
-        required: true,
-        unique: true,
+        type: String
+       
     },
     courseCode: {
-        type: String,
-        required: true,
-        unique: true,
+        type: String
     }
 });
 

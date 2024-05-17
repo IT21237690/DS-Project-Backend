@@ -45,12 +45,12 @@ router.post('/enroll/:code/:sid', async (req, res) => {
     });
 
 
-    // await axios.post(`http://service5:5004/api/sms/smsReg/${sid}`, {
-    // }, {
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   }
-    // });
+    await axios.post(`http://service5:5004/api/sms/smsReg/${sid}`, {
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
 
 
     res.status(200).json({ message: 'Enrolled successfully', sid: sid });
